@@ -1,0 +1,7 @@
+[package]
+name = "wlc"
+version = "0.1.0"
+authors = ["Josh Chase <jcjoshuachase@gmail.com>"]
+
+[dependencies]
+libc = "*"
