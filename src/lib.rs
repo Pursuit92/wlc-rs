@@ -2,7 +2,7 @@ extern crate libc;
 
 mod sys;
 
-use sys::{wlc_handle, wlc_view_bring_to_front, wlc_view_focus, wlc_view_set_state, WLC_BIT_ACTIVATED, Struct_wlc_interface, wlc_init, wlc_run};
+use sys::{wlc_handle, wlc_view_bring_to_front, wlc_view_focus, wlc_view_set_state, WLC_BIT_ACTIVATED, Struct_wlc_interface, wlc_init, wlc_run, Enum_wlc_log_type, wlc_log_set_handler};
 
 use libc::{c_char, c_int};
 
@@ -25,6 +25,13 @@ pub fn example() {
         unsafe { wlc_view_set_state(view, WLC_BIT_ACTIVATED, focus) }
     }
 
+    extern "C" fn cb_log(log_type: Enum_wlc_log_type, msg: *const c_char) -> () {
+        unsafe {
+            let msg_string: String = String::from_utf8_lossy(ffi::CStr::from_ptr(msg).to_bytes()).into_owned();
+            println!("{}", msg_string);
+        }
+    }
+
     let mut interface = Struct_wlc_interface::default();
 
     interface.view.created = Some(view_created);
@@ -34,6 +41,7 @@ pub fn example() {
     let mut args:Vec<*mut c_char> = argv.into_iter().map(|arg| { arg.as_ptr() as *mut c_char } ).collect();
 
     unsafe {
+        wlc_log_set_handler(Some(cb_log));
         if !(wlc_init(&mut interface, args.len() as c_int, args.as_mut_ptr()) == 1) {
             panic!("lolwut")
         }

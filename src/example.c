@@ -20,9 +20,17 @@ view_focus(wlc_handle view, bool focus)
   wlc_view_set_state(view, WLC_BIT_ACTIVATED, focus);
 }
 
+static void
+cb_log(enum wlc_log_type type, const char *str)
+{
+  (void)type;
+  printf("%s\n", str);
+}
+
 int
 main(int argc, char *argv[])
 {
+  wlc_log_set_handler(cb_log);
   static struct wlc_interface interface = {
     .view = {
       .created = view_created,
